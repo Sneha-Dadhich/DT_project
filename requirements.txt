@@ -18,5 +18,5 @@ Flask-Minify==0.37
 flask-dance==7.0.0
 blinker==1.6.2
 
-# flask_mysqldb
-# psycopg2-binary
+flask_mysqldb
+psycopg2-binary

@@ -4,6 +4,9 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 import os, random, string
+from dotenv import load_dotenv
+
+load_dotenv("C:\\Sneha\\Programs1\\Python\\Internship\\DreamTeam\\FLASK\\.env")
 
 class Config(object):
 
@@ -16,11 +19,11 @@ class Config(object):
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    DB_ENGINE   = os.getenv('DB_ENGINE'   , None)
-    DB_USERNAME = os.getenv('DB_USERNAME' , None)
-    DB_PASS     = os.getenv('DB_PASS'     , None)
-    DB_HOST     = os.getenv('DB_HOST'     , None)
-    DB_PORT     = os.getenv('DB_PORT'     , None)
+    DB_ENGINE   = os.getenv('DB_ENGINE'       , None)
+    DB_USERNAME = os.getenv('DB_USERNAME'            , None)
+    DB_PASS     = os.getenv('DB_PASS'       , None)
+    DB_HOST     = os.getenv('DB_HOST'         , None)
+    DB_PORT     = os.getenv('DB_PORT'         , None)
     DB_NAME     = os.getenv('DB_NAME'     , None)
 
     USE_SQLITE  = True 

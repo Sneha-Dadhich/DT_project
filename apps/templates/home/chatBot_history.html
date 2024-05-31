@@ -1,0 +1,191 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} ChatBot History {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="py-4">
+      <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+          <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+              <li class="breadcrumb-item">
+                  <a href="#">
+                      <svg class="icon icon-xxs" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                  </a>
+              </li>
+              <li class="breadcrumb-item"><a href="#">ChatBot Options</a></li>
+              <li class="breadcrumb-item active" aria-current="page">ChatBot History</li>
+          </ol>
+      </nav>
+    </div>
+  
+<style>
+  /* styles.css */
+  body {
+  font-family: Arial, sans-serif;
+  height: 100vh;
+  margin: 0;
+  }
+  
+  .dropdown-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  gap: 20px;
+  }
+  
+  .chat_history_drp_dwn
+  {
+    border-radius: 10px;
+  }
+  select 
+  {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+  }
+
+  #searched_Topics
+  {
+    position: relative;
+    margin-top: 5%;
+    display: flex;
+    flex-direction: row;
+  }
+  </style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+            fetchDropdownData('/get_years', 'yearDropdown', 'year')
+                .then(() => {
+                    document.getElementById('yearDropdown').addEventListener('change', function() {
+                        const selectedYear = this.value;
+                        if (selectedYear) {
+                            fetchDropdownData(`/get_months?yearDropdown=${selectedYear}`, 'monthDropdown', 'month')
+                                .then(() => {
+                                    document.getElementById('monthDropdown').addEventListener('change', function() {
+                                        const selectedMonth = this.value;
+                                        if (selectedMonth) {
+                                            const selectedYear = document.getElementById('yearDropdown').value;
+                                            fetchDropdownData(`/get_days?yearDropdown=${selectedYear}&monthDropdown=${selectedMonth}`, 'dayDropdown', 'day')
+                                                .then(() => {
+                                                    document.getElementById('dayDropdown').addEventListener('change', function() {
+                                                        const selectedDay = this.value;
+                                                        if (selectedDay) {
+                                                            const selectedYear = document.getElementById('yearDropdown').value;
+                                                            const selectedMonth = document.getElementById('monthDropdown').value;
+                                                            const selectedDay = document.getElementById('dayDropdown').value;
+                                                            fetchAndDisplayData();
+                                                            fetchDropdownData('/searched_data', dropdownId, key)
+                                                        }
+                                                    });
+                                                });
+                                        }
+                                    });
+                                })
+                                .catch(error => console.error("Error fetching months:", error));
+                        }
+                    });
+                })
+                .catch(error => console.error("Error fetching years:", error));
+        });
+
+        function fetchDropdownData(url, dropdownId, key) {
+            return fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const dropdown = document.getElementById(dropdownId);
+                    dropdown.innerHTML = '<option value="">Select</option>';
+                    data.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item[key];
+                        option.textContent = item[key];
+                        dropdown.appendChild(option);
+                    });
+                })
+                .catch(error => console.error(`Error fetching data from ${url}:`, error));
+        }
+
+        function fetchAndDisplayData() {
+            //fetchDropdownData('searched_data', 'questions', key)
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', '/searched_data','true');
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    const data = response.questions || [];
+                    const listElement = document.getElementById('questions');
+                    listElement.innerHTML = ''; // Clear existing list
+                    data.forEach(item => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = item;
+                        listElement.appendChild(listItem);
+                    });
+                } else {
+                    console.error('Error fetching data:', xhr.status, xhr.statusText);
+                }
+            };
+            xhr.onerror = function () {
+                console.error('Request error');
+            };
+            xhr.send();
+        }
+        </script>
+
+
+    <select id="yearDropdown" method="GET" action="#">
+        <option value="null" disabled selected>Select a year</option>
+    </select>
+    <select id="monthDropdown" method="GET" action="#">
+        <option value="null" disabled selected>Select a month</option>
+    </select>
+    <select id="dayDropdown" method="GET" action="#">
+        <option value="null" disabled selected>Select a day</option>
+    </select>
+
+    <div id="searched_Topics">
+        <div id="questions" 
+            style="height: 5%; width: 35%; 
+            background-color: rgb(250, 250, 250);
+            font-size: medium;
+            border: 1px solid lightblue;
+            border-radius: 4px;
+
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-content: center;
+            
+            border-top-right-radius:0px;
+            border-bottom-right-radius: 0px;
+            ">
+            <h2>Questions</h2>
+        </div>
+
+        <div id="answers" 
+            style="height: 5%; 
+            width:45%; 
+            background-color: rgb(250, 250, 250); 
+            font-size: medium;
+            border: 1px solid lightblue;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-content: center;">
+            <h2>Answers</h2>
+        </div>
+
+    </div>
+    <!--{% endblock content %}-->
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
