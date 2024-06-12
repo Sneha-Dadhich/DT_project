@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toggle View</title>
+    <style>
+        h1 {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 5%;
+            width: 100%;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            justify-content: center;
+            background-color: mintcream;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        .chat-container {
+            width: 60%;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        .chat_message {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .chat-time {
+            font-size: 0.9em;
+            color: #666;
+        }
+        .chat_question {
+            padding-left: 3%  !important;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .chat_answer {
+            padding-top: 2%;
+            padding-left: 3%  !important;
+            margin-top: 5px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Search Results</h1>
+    
+    <div id="table_div" class="table_div">
+        {% if results %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Question</th>
+                    <th>Answer</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for time, ques, ans in results %}
+                <tr>
+                    <td>{{ time }}</td>
+                    <td>{{ ques }}</td>
+                    <td>{{ ans }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No results found.</p>
+        {% endif %}
+    </div>
+    
+    <div id="chat_div" class="chat_div hidden">
+        {% if results %}
+        <div class="chat-container">
+            {% for time, ques, ans in results %}
+            <div class="chat_message">
+                <div class="chat-time">
+                    <button class="show_answer" style="border-radius: 100%;">> </button>
+                    {{ time }}
+                </div>
+                <div class="chat_question">{{ ques }}</div>
+                <div class="chat_answer ">{{ ans }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No results found.</p>
+        {% endif %}
+    </div>
+
+    <script>
+
+        document.getElementById("tableModeRadio").checked = true;
+
+        function showTableOrChat() {
+            const tableModeRadio = document.getElementById('tableModeRadio');
+            const chatModeRadio = document.getElementById('chatModeRadio');
+            const tableDiv = document.getElementById('table_div');
+            const chatDiv = document.getElementById('chat_div');
+            
+            if (tableModeRadio.checked) {
+                tableDiv.style.display = 'block';
+                chatDiv.style.display = 'none';
+            } 
+            else if (chatModeRadio.checked) 
+            {
+                tableDiv.style.display = 'none';
+                chatDiv.style.display = 'block';
+            }
+        }
+        
+        // Hide elements with the class name "chat_answer"
+        document.querySelectorAll(".chat_answer").forEach(answerElement => {
+            answerElement.style.display = "none";
+        });
+
+        document.querySelectorAll(".show_answer").forEach(button => {
+        button.addEventListener("click", function(event) {
+
+            const chatMessage = button.closest('.chat_message');
+            if (chatMessage) {
+                const chatAnswerElement = chatMessage.querySelector('.chat_answer');
+            if (chatAnswerElement) {
+                if (chatAnswerElement.style.display == 'none'){
+                    chatAnswerElement.style.display = "block";
+                }
+                else {
+                    chatAnswerElement.style.display = "none";
+                }
+            }
+            }
+        });
+        });
+
+        tableModeRadio.addEventListener('change', showTableOrChat);
+        chatModeRadio.addEventListener('change', showTableOrChat); 
+        
+    </script>
+</body>
+</html>

@@ -69,7 +69,6 @@ var Recorder = exports.Recorder = (function () {
             });
         };
 
-        console.log("2nd script connected externally")
         source.connect(this.node);
         this.node.connect(this.context.destination); //this should not be necessary
 

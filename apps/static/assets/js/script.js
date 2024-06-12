@@ -15,8 +15,8 @@ let audioContext;
 let recorder;
 let audioChunks = [];
 
-document.querySelector("button").addEventListener("click", () => {
-    speech.text = document.querySelector("textarea").value;
+document.getElementById("btnlisten").addEventListener("click", () => { 
+    speech.text = document.getElementById("textarea").value;
     window.speechSynthesis.speak(speech);
 
     // Start recording

@@ -24,9 +24,10 @@ class Config(object):
     DB_PASS     = os.getenv('DB_PASS'       , None)
     DB_HOST     = os.getenv('DB_HOST'         , None)
     DB_PORT     = os.getenv('DB_PORT'         , None)
-    DB_NAME     = os.getenv('DB_NAME'     , None)
+    DB_NAME     = os.getenv('DB_NAME'   , None)
 
     USE_SQLITE  = True 
+
 
     # try to set up a Relational DBMS
     if DB_ENGINE and DB_NAME and DB_USERNAME:

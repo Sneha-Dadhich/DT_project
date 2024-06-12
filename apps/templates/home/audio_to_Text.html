@@ -1,0 +1,149 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} ChatBot History {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="py-4">
+      <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+          <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+              <li class="breadcrumb-item">
+                  <a href="#">
+                      <svg class="icon icon-xxs" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                  </a>
+              </li>
+              <li class="breadcrumb-item"><a href="#">Audio-Text Synthesis</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Audio To Text</li>
+          </ol>
+      </nav>
+    </div>
+
+    <!--my cod estarts here-->
+
+    <style>
+        .spinner {
+            display: none;
+            margin-left: 2%;
+            margin-top: 1%;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    
+    <form name="frm_audio_form" id="frm_audio_form" style="
+        display: flex;
+        flex-direction: column;
+        margin-left: 2%;
+        padding: 2%;
+        width: 85%;
+        background-color: whitesmoke;">
+        
+        <h4>Add you audio file here</h4>
+        <input accept="audio/*" type="file" name="audio_file1">
+        <label> or </label>
+        <input accept="audio/*" type="url" name="audio_file2" placeholder="Insert URL" style="width: 70%;">
+        <input type="submit" name="submit" value="Submit" id="submitBtn" style="
+        background-color: rgb(31, 41, 55);
+        border-radius: 10px;
+        color:whitesmoke;
+        height:15%;
+        width:10%;
+        margin-top: 1%;"
+        method="POST" action="/audio_to_text">
+    </form>
+
+    <label style="
+        margin-top: 5%;
+        margin-bottom: 0;
+        margin-left:2% "> 
+
+    The given audio file said
+    </label>
+    
+    <label id="answer" name="answer" style="
+    width:80% ;
+    height:30% ;
+    background-color: snow;
+
+    border-radius: 10px;
+    border: 1px lightblue solid;;
+
+    margin-left:2% ;
+    margin-top: 1%;
+    padding-top: 2%;
+    padding-bottom: 2%;
+    padding-left: 1%;
+    padding-right: 1%;
+    ">
+    {% if text %}
+    <text style="color:black">{{text}}</text>
+    {% else %}
+    {{text}}
+    <text style="color:red">Please insert the audio file....</text>    
+    {% endif %}
+</label>
+
+<div class="spinner" id="loadingSpinner"></div>
+
+<script src="{{ config.ASSETS_ROOT }}/js/jquery-3.7.1.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("submitBtn").addEventListener("click", function(event) {
+                event.preventDefault(); // Prevent the default form submission
+                fetchAndDisplayData();
+                $('#loadingSpinner').show(); // Show the loading spinner
+            });
+        });
+
+        function hide_spinner(){
+            const spinner = document.getElementById("loadingSpinner")
+            spinner.style.display = "none";             
+        }
+
+        function fetchAndDisplayData() {
+            alert("JS activated");
+            var formData = new FormData(document.getElementById('frm_audio_form'));
+
+            $.ajax({
+                type: "POST",
+                url: '/get_audio',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(data) {
+                    hide_spinner();
+                    $('#answer').text(data.answer);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error occurred: " + error);
+                }
+            });
+        }
+
+        function toggleInputs(changedInput) {
+            if (changedInput.id === "audio_file_input") {
+                document.getElementById('audio_url_input').disabled = changedInput.value !== "";
+            } else if (changedInput.id === "audio_url_input") {
+                document.getElementById('audio_file_input').disabled = changedInput.value !== "";
+            }
+        }
+
+    </script>
+</script>
+
+<!--my code ends here-->
+  
+<!--{% endblock content %}-->
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

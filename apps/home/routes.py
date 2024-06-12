@@ -1,14 +1,14 @@
-from flask import render_template, request
 from flask_login import login_required, current_user
 from jinja2 import TemplateNotFound
 import wikipedia
 import random
 import requests
 from flask import Flask, render_template, request, jsonify, send_file
+
 from apps.chat_history.chat_history_DBadder import add_search_to_database, find_user_id_by_username
 from apps.home import blueprint
 from apps.chat_history.chat_history_DBadder import dropdown_data, search_data
-
+from apps.audio_To_Text.audio_to_text_bk import audio_to_text, global_audio_to_text
 responses = {
     "hi": ["Hello!", "Hi there!", "Hey!"],
     "how are you?": ["I'm good, thank you!", "I'm doing well, thanks for asking.", "All good!"],
@@ -39,10 +39,11 @@ def index():
 @blueprint.route('/<template>')
 @login_required
 def route_template(template):
-
     try:
-        if template=="dashboard":
+        if template in ["dashboard.html","dashboard","audio_to_Text.html","audio_to_Text"
+                        ,"Audio_to_Text.html","Audio_to_Text"]:
             pass
+            print(template)
         if not template.endswith('.html'):
             template += '.html'
 
@@ -117,24 +118,53 @@ def get_days():
                 return jsonify(day)
         
         if year is None or month is None:
-            return jsonify({"error": "Year and Month parameters are required"}), 400
+            return jsonify({"error": "Year and Month parameters are required"}) 
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@blueprint.route('/searched_data',methods=['GET'])    
-def chat_data():
-    if request.method=="GET":
-        year = request.form.get("yearDropdown", type=int)
-        month = request.form.get("monthDropdown", type=int)
-        day = request.form.get("dayDropdown", type=int)
-            
-        print(f"year: {year} \nmonth: {month} \nday: {day}")
-        print("test 1 : passed")
+@blueprint.route('/searched_data',methods=['POST'])    
+def searched_data():
+    if request.method=='POST':
+        year = request.form["Dropdown1"]
+        month = request.form["Dropdown2"]
+        day = request.form["Dropdown3"]
+        ques = search_data('question',year,month,day)
+        return ques
+
+@blueprint.route("/audio_to_text.html")
+def AudioToText():
+    return render_template("home/audio_to_Text.html")
+
+
+@blueprint.route('/get_audio',methods=['POST','GET'])
+def get_audio_request():
+    print("Routing function mei aa gaye...")
+    if request.method=="POST":
+        print("post bhi ho gaya...")
+        #audio=request.form.get("audio_file1")
+        audio1=request.files["audio_file1"]
+        audio2=request.form["audio_file2"]
         
-        search_data('question',year,month,day)
-        return jsonify({"question":search_data})
-    
+        
+        if audio1!=None and audio1!="None":
+            audio_file=request.files.get("audio_file1")
+            print("there is audio")
+            print(audio1)
+            text=audio_to_text(audio1)
+            return jsonify({'answer': text})
+
+        
+        if audio2!=None and audio2!="None":
+            audio_file=request.form.get("audio_file2")
+            print("there is audio link")
+            print(audio2)
+            text=global_audio_to_text(audio2)
+            return jsonify({'answer': text})
+        
+    return render_template("home/audio_to_Text.html")
+
+
 @blueprint.route('/chatBot_history.html')
 @login_required
 def chat_history():
@@ -157,6 +187,7 @@ def return_script():
 def voice_synthesis():
     return render_template("home/transactions.html")
     
+
 def get_segment(request):
     try:
         segment = request.path.split('/')[-1]

@@ -1,21 +1,15 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
-
 from sqlalchemy.orm import relationship, sessionmaker, Session
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 from datetime import datetime
 from sqlalchemy.orm import relationship, create_session
 from flask_login import UserMixin, login_required, current_user, login_user
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import extract, create_engine, distinct
-from flask import request, jsonify
+from sqlalchemy import extract, create_engine, distinct, func
+from flask import render_template, request, jsonify
 from apps import db, login_manager
 from apps.authentication.util import hash_pass
 from apps.home import blueprint
 from apps.authentication.models import Users
-
 
 class Search_hist(db.Model, UserMixin):
     __tablename__ = 'search_history'
@@ -82,29 +76,20 @@ def dropdown_data(column, selected_year=0, selected_month=None):
         
 def search_data(column,year,month,day):
     session = db.session
-    print("search data mei pahuch gaye")
+    #print("search data mei pahuch gaye")
 
     if column=="question":
-        print("test case 2 : passed")
-        question_searched = session.query(distinct(Search_hist.question).label('question'))\
-            .filter(extract('year', Search_hist.search_dateTime) == year)\
-            .filter(extract('month', Search_hist.search_dateTime) == month)\
-            .filter(extract('day', Search_hist.search_dateTime) == day)\
-            .order_by(Search_hist.search_dateTime).all()
-        print("test case 3 : passed")
-        print(question_searched)
-        return jsonify({"question" : {question_searched}})
+        #print("column name is correct")
+        results = session.query(Search_hist.search_dateTime, Search_hist.question, Search_hist.answer).filter(
+            extract('day', Search_hist.search_dateTime) == day,
+            extract('month', Search_hist.search_dateTime) == month,
+            extract('year', Search_hist.search_dateTime) == year,
+            Search_hist.search_id.like('arijit_%')
+            ).all()
 
-    if column=="answer":
-        print("test case 2 : passed")
-        question_searched = session.query(distinct(extract('answer', Search_hist.question)).label('answer'))\
-                              .filter(extract('year', Search_hist.search_dateTime) == year)\
-                              .filter(extract('month', Search_hist.search_dateTime) == month)\
-                              .filter(extract('day', Search_hist.search_dateTime) == day)\
-                              .order_by(Search_hist.search_dateTime.time).all()
-        print(question_searched)
-        return jsonify({"question" : {question_searched}})
+        return render_template("home/get_history.html", results = results)
 
+    
 '''
         extract('month', Search_hist.search_dateTime).label('month'),
         extract('day', Search_hist.search_dateTime).label('day'),

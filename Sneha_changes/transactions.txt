@@ -105,11 +105,6 @@
         outline: 0;
         border: 0;
         border-radius: 35px;
-        appearance: none;
-        background-image: url('images/dropdown.png'); /* Fixed the quotation marks around the URL */
-        background-repeat: no-repeat;
-        background-size: 15px;
-        background-position: calc(100% - 20px) 20px;
     }
     
     </style>
@@ -119,16 +114,17 @@
     <textarea placeholder="Write anything here" id="textarea"></textarea>
     <div class="row">
         <select></select>
-        <button id="btnlisten" class="listen_btn"><img>Listen</button>
+        <button class="listen_btn"><img>Listen</button>
     </div>
 </div>
 
-<script src="{{ config.ASSETS_ROOT }}/js/script.js"></script>
-<script src="{{ config.ASSETS_ROOT }}/js/recorder.js"></script>
-<script src="{{ config.ASSETS_ROOT }}/js/lame.min.js"></script>
+<script src="{{ url_for('static', filename='assets/js/script.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/js/recorder.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/js/lame.min.js') }}"></script>
 
-
-<!--<script src="{{url_for('home_blueprint.return_recorder')}} "></script>
+<!--
+<script src="{{url_for('home_blueprint.return_script')}}"></script>
+<script src="{{url_for('home_blueprint.return_recorder')}} "></script>
 <script src="{{url_for('home_blueprint.return_lame')}}"></script>
 -->
 
